@@ -1,28 +1,42 @@
-import React, {FC} from 'react';
-import {View} from 'react-native';
+import React, {FC, memo} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import {format} from 'date-fns';
-import {TextWrapper, Tile} from '../../../../components';
-import {IEvent} from '../../../../models/types';
+import {TextWrapper} from '../../../../components';
 import {styles} from './styles';
 
-const Event: FC<IEvent> = ({
-  actor: {login, url},
-  repo: {name, url: repoUrl},
-  type,
-  created_at,
+type Props = {
+  userLogin: string;
+  userUrl: string;
+  eventType: string;
+  createdAt: string;
+  repoName: string;
+  repoUrl: string;
+  onPress: () => void;
+};
+
+const Event: FC<Props> = ({
+  userLogin,
+  userUrl,
+  eventType,
+  createdAt,
+  repoName,
+  repoUrl,
+  onPress,
 }) => {
   return (
-    <Tile>
-      <View style={styles.header}>
-        <TextWrapper style={styles.nickname}>@{login}</TextWrapper>
-        <TextWrapper>{url}</TextWrapper>
-      </View>
-      <TextWrapper>Event type: {type}</TextWrapper>
-      <TextWrapper>Repo Name: {name}</TextWrapper>
-      <TextWrapper>Repo URL: {repoUrl}</TextWrapper>
-      <TextWrapper>{format(new Date(created_at), 'yyyy-MM-dd')}</TextWrapper>
-    </Tile>
+    <View style={[styles.container, styles.shadow]}>
+      <TouchableOpacity onPress={onPress}>
+        <View style={styles.header}>
+          <TextWrapper style={styles.nickname}>@{userLogin}</TextWrapper>
+          <TextWrapper>{userUrl}</TextWrapper>
+        </View>
+        <TextWrapper>Event type: {eventType}</TextWrapper>
+        <TextWrapper>Repo Name: {repoName}</TextWrapper>
+        <TextWrapper numberOfLines={1}>Repo URL: {repoUrl}</TextWrapper>
+        <TextWrapper>Created at: {createdAt}</TextWrapper>
+      </TouchableOpacity>
+    </View>
   );
 };
 
-export default Event;
+export default memo(Event);

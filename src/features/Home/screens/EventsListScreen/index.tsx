@@ -1,9 +1,10 @@
-import React, {FC} from 'react';
-import {FlatList, ListRenderItem, TouchableOpacity, View} from 'react-native';
+import React, {FC, useCallback} from 'react';
+import {FlatList, ListRenderItem, View} from 'react-native';
 import Animated from 'react-native-reanimated';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {ErrorMessage, Loader, TextWrapper} from '../../../../components';
+import {format} from 'date-fns';
+import {ErrorMessage, TextWrapper} from '../../../../components';
 import {StackParamList} from '../../../../models/navigation';
 import {IEvent} from '../../../../models/types';
 import Event from '../../components/Event';
@@ -30,32 +31,37 @@ const ItemSeparatorComponent: FC = () => {
 type Props = NativeStackScreenProps<StackParamList, 'EventsList'>;
 
 const EventsListScreen: FC<Props> = ({navigation}) => {
-  const {
-    isRefreshing,
-    events,
-    error,
-
-    refreshEvents,
-  } = useGithubEvents();
+  const {isRefreshing, events, error, refreshEvents} = useGithubEvents();
   const {animatedOpacityStyle} = useAnimatedOpacity();
 
-  const renderEvent: ListRenderItem<IEvent> = ({item}) => {
-    const navigateToDetails = () => {
-      navigation.navigate('EventDetails', {
-        avatarUrl: item.actor.avatar_url,
-        login: item.actor.display_login,
-        orgLogin: item.org?.login,
-        orgUrl: item.org?.url,
-        eventType: item.type,
-      });
-    };
+  const renderEvent: ListRenderItem<IEvent> = useCallback(
+    ({item}) => {
+      const navigateToDetails = () => {
+        navigation.navigate('EventDetails', {
+          avatarUrl: item.actor.avatar_url,
+          login: item.actor.display_login,
+          orgLogin: item.org?.login,
+          orgUrl: item.org?.url,
+          eventType: item.type,
+        });
+      };
 
-    return (
-      <TouchableOpacity onPress={navigateToDetails}>
-        <Event {...item} />
-      </TouchableOpacity>
-    );
-  };
+      const formatedDate = format(new Date(item.created_at), 'yyyy-MM-dd');
+
+      return (
+        <Event
+          userLogin={item.actor.login}
+          userUrl={item.actor.url}
+          eventType={item.type}
+          createdAt={formatedDate}
+          repoName={item.repo.name}
+          repoUrl={item.repo.url}
+          onPress={navigateToDetails}
+        />
+      );
+    },
+    [navigation],
+  );
 
   return (
     <SafeAreaView style={styles.container}>

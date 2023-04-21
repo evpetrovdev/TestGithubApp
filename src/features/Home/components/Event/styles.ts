@@ -8,7 +8,6 @@ export const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    gap: dimensions.offset.tiny,
     marginBottom: dimensions.offset.small,
   },
   nickname: {

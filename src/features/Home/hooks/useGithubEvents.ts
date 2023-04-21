@@ -54,7 +54,6 @@ const useGithubEvents = () => {
     isRefreshing,
     error,
     events,
-
     refreshEvents,
     cleanInterval,
   };
